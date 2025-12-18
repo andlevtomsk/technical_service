@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Оборудование</h1>
+    <a href="{% url 'equipment_add' %}" class="btn btn-primary">Добавить оборудование</a>
+</div>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Наименование</th>
+            <th>Инвентарный номер</th>
+            <th>Тип оборудования</th>
+            <th>Дата ввода</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for equipment in equipments %}
+        <tr>
+            <td>{{ equipment.name }}</td>
+            <td>{{ equipment.inventory_number }}</td>
+            <td>{{ equipment.equipment_type.name }}</td>
+            <td>{{ equipment.installation_date }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4" class="text-center">Оборудование не найдено</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

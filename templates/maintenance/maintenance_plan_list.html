@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Планы обслуживания</h1>
+    <div>
+        <a href="{% url 'maintenance_plan_add' %}" class="btn btn-primary">Добавить план</a>
+    </div>
+</div>
+
+{% if plans %}
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Оборудование</th>
+                <th>Вид обслуживания</th>
+                <th>Плановая дата</th>
+                <th>Статус</th>
+                <th>Фактическая дата</th>
+                <th>Создано</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for plan in plans %}
+            <tr>
+                <td>
+                    <strong>{{ plan.equipment.name }}</strong>
+                    <br><small class="text-muted">{{ plan.equipment.inventory_number }}</small>
+                </td>
+                <td>
+                    <span class="badge 
+                        {% if plan.maintenance_type.code == 'ТО' %}bg-primary
+                        {% elif plan.maintenance_type.code == 'ТР' %}bg-warning text-dark
+                        {% else %}bg-info{% endif %}">
+                        {{ plan.maintenance_type.name }}
+                    </span>
+                </td>
+                <td>{{ plan.planned_date }}</td>
+                <td>
+                    <span class="badge 
+                        {% if plan.status == 'planned' %}bg-secondary
+                        {% elif plan.status == 'in_progress' %}bg-warning text-dark
+                        {% elif plan.status == 'completed' %}bg-success
+                        {% else %}bg-danger{% endif %}">
+                        {{ plan.get_status_display }}
+                    </span>
+                </td>
+                <td>
+                    {% if plan.actual_date %}
+                        {{ plan.actual_date }}
+                    {% else %}
+                        <span class="text-muted">—</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <small class="text-muted">
+                        {{ plan.created_at|date:"d.m.Y" }}<br>
+                        {% if plan.created_by %}
+                            {{ plan.created_by.username }}
+                        {% else %}
+                            Система
+                        {% endif %}
+                    </small>
+                </td>
+                <td>
+                    <div class="btn-group btn-group-sm">
+                        <a href="{% url 'maintenance_plan_edit' plan.pk %}" class="btn btn-outline-primary" title="Редактировать">
+                            Редактировать
+                        </a>
+                        <a href="{% url 'maintenance_plan_delete' plan.pk %}" class="btn btn-outline-danger" title="Удалить">
+                            Удалить
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="text-center py-5">
+    <div class="text-muted mb-3">
+        <h4>Планы обслуживания не найдены</h4>
+        <p>Создайте первый план обслуживания для отображения в системе</p>
+    </div>
+    <a href="{% url 'maintenance_plan_add' %}" class="btn btn-primary btn-lg">Добавить первый план</a>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<style>
+.btn-group-sm .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    border-radius: 0.25rem;
+}
+
+.btn-group-sm {
+    flex-wrap: nowrap;
+}
+
+.table th {
+    border-top: none;
+    font-weight: 600;
+}
+
+.badge {
+    font-size: 0.75em;
+}
+</style>
+{% endblock %}

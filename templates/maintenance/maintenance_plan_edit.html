@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Редактирование плана обслуживания</h4>
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h6>Информация о плане:</h6>
+                        <table class="table table-sm table-bordered">
+                            <tr>
+                                <th>Оборудование:</th>
+                                <td>{{ plan.equipment.name }}</td>
+                            </tr>
+                            <tr>
+                                <th>Инвентарный номер:</th>
+                                <td>{{ plan.equipment.inventory_number }}</td>
+                            </tr>
+                            <tr>
+                                <th>Вид обслуживания:</th>
+                                <td>{{ plan.maintenance_type.name }}</td>
+                            </tr>
+                            <tr>
+                                <th>Плановая дата:</th>
+                                <td><strong>{{ plan.planned_date }}</strong></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>История изменений:</h6>
+                        <table class="table table-sm table-bordered">
+                            <tr>
+                                <th>Создано:</th>
+                                <td>
+                                    {{ plan.created_at|date:"d.m.Y H:i" }}<br>
+                                    <small class="text-muted">
+                                        {% if plan.created_by %}
+                                            {{ plan.created_by.username }}
+                                        {% else %}
+                                            Система
+                                        {% endif %}
+                                    </small>
+                                </td>
+                            </tr>
+                            {% if plan.updated_by %}
+                            <tr>
+                                <th>Изменено:</th>
+                                <td>
+                                    {{ plan.updated_at|date:"d.m.Y H:i" }}<br>
+                                    <small class="text-muted">{{ plan.updated_by.username }}</small>
+                                </td>
+                            </tr>
+                            {% endif %}
+                        </table>
+                    </div>
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.status.id_for_label }}" class="form-label">Статус:</label>
+                                {{ form.status }}
+                                {% if form.status.errors %}
+                                <div class="text-danger">
+                                    {{ form.status.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.actual_date.id_for_label }}" class="form-label">Фактическая дата:</label>
+                                {{ form.actual_date }}
+                                <div class="form-text">
+                                    {% if plan.status == 'completed' and not plan.actual_date %}
+                                    <span class="text-warning">Для выполненных работ укажите фактическую дату</span>
+                                    {% else %}
+                                    Заполняется автоматически при статусе "Выполнено"
+                                    {% endif %}
+                                </div>
+                                {% if form.actual_date.errors %}
+                                <div class="text-danger">
+                                    {{ form.actual_date.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.notes.id_for_label }}" class="form-label">Примечания:</label>
+                        {{ form.notes }}
+                        {% if form.notes.errors %}
+                        <div class="text-danger">
+                            {{ form.notes.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+                        <a href="{% url 'maintenance_plan_list' %}" class="btn btn-secondary">Отмена</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
